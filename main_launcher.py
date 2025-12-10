@@ -130,11 +130,16 @@ class Launcher(QtWidgets.QMainWindow):
         self.puzzle_btn.setStyleSheet(active_button_style)
         self.puzzle_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
 
+        self.nerimene_btn = QtWidgets.QPushButton("📊 Nerimene — Billboard Selection")
+        self.nerimene_btn.setStyleSheet(active_button_style)
+        self.nerimene_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         # Add buttons to grid
         grid.addWidget(self.my_work_btn, 0, 0)
         grid.addWidget(self.btn5, 0, 1)
         grid.addWidget(self.shift_scheduler_btn, 1, 0)
         grid.addWidget(self.puzzle_btn, 1, 1)
+        # Nerimene button below other buttons, spanning both columns
+        grid.addWidget(self.nerimene_btn, 2, 0, 1, 2)
 
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
@@ -180,6 +185,7 @@ class Launcher(QtWidgets.QMainWindow):
         self.btn5.clicked.connect(self.open_scheduler)
         self.shift_scheduler_btn.clicked.connect(self.open_shift_scheduler)
         self.puzzle_btn.clicked.connect(self.open_puzzle)
+        self.nerimene_btn.clicked.connect(self.open_nerimene)
 
     def open_amr_work(self):
         if not hasattr(self, 'amr_window'):
@@ -193,7 +199,7 @@ class Launcher(QtWidgets.QMainWindow):
 
         if not hasattr(self, 'scheduler_window'):
             self.scheduler_window = SchedulerWindow()
-        self.scheduler_window.show()
+        self.scheduler_window.showMaximized()
         self.scheduler_window.raise_()
 
     def open_puzzle(self):
@@ -202,7 +208,7 @@ class Launcher(QtWidgets.QMainWindow):
             from puzzle.main_window import MainWindow as PuzzleWindow
             if not hasattr(self, 'puzzle_window'):
                 self.puzzle_window = PuzzleWindow()
-            self.puzzle_window.show()
+            self.puzzle_window.showMaximized()
             self.puzzle_window.raise_()
         except Exception as e:
             error_msg = QtWidgets.QMessageBox(self)
@@ -226,12 +232,29 @@ class Launcher(QtWidgets.QMainWindow):
             
             if not hasattr(self, 'shift_scheduler_window'):
                 self.shift_scheduler_window = ShiftSchedulerWindow()
-            self.shift_scheduler_window.show()
+            self.shift_scheduler_window.showMaximized()
             self.shift_scheduler_window.raise_()
         except Exception as e:
             error_msg = QtWidgets.QMessageBox(self)
             error_msg.setWindowTitle("Error")
             error_msg.setText(f"Failed to open Shift Scheduler:\n{str(e)}")
+            error_msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+            error_msg.exec()
+
+    def open_nerimene(self):
+        """Open the Nerimene module (billboard selection GUI)."""
+        try:
+            # Import the GUI MainWindow from the nerimene folder
+            from nerimene.gui_gurobi import MainWindow as NerimeneWindow
+
+            if not hasattr(self, 'nerimene_window'):
+                self.nerimene_window = NerimeneWindow()
+            self.nerimene_window.showMaximized()
+            self.nerimene_window.raise_()
+        except Exception as e:
+            error_msg = QtWidgets.QMessageBox(self)
+            error_msg.setWindowTitle("Error")
+            error_msg.setText(f"Failed to open Nerimene module:\n{str(e)}")
             error_msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
             error_msg.exec()
 
@@ -242,5 +265,5 @@ class Launcher(QtWidgets.QMainWindow):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     launcher = Launcher()
-    launcher.show()
+    launcher.showMaximized()
     sys.exit(app.exec())

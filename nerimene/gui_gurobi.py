@@ -9,8 +9,8 @@ matplotlib.use("QtAgg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from gurobi_maxkcover import solve_max_k_coverage_with_gurobi
-from greedy_fast import greedy_max_k_cover_fast
+from .gurobi_maxkcover import solve_max_k_coverage_with_gurobi
+from .greedy_fast import greedy_max_k_cover_fast
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
