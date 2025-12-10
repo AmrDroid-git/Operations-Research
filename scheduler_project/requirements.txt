@@ -1,0 +1,5 @@
+PySide6>=6.5.0
+gurobipy>=10.0.0
+matplotlib>=3.7.0
+reportlab>=4.0.0
+numpy>=1.24.0

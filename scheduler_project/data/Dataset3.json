@@ -1,0 +1,12 @@
+[
+  {"id":"P1","duration":45,"machine":"IRM1","priority":10,"release":0,"deadline":120,"staff_group":"TechA"},
+  {"id":"P2","duration":30,"machine":"IRM1","priority":8,"release":10,"deadline":130,"staff_group":"TechA","setup_after":{"P1":5}},
+  {"id":"P3","duration":25,"machine":"IRM2","priority":7,"release":0,"deadline":100,"staff_group":"TechA"},
+  {"id":"P4","duration":50,"machine":"Scanner1","priority":6,"release":0,"deadline":150,"staff_group":"TechB"},
+  {"id":"P5","duration":35,"machine":"Scanner1","priority":9,"release":20,"deadline":160,"staff_group":"TechB","setup_after":{"P4":10}},
+  {"id":"P6","duration":20,"machine":"Scanner2","priority":5,"release":5,"deadline":90,"staff_group":"TechC"},
+  {"id":"P7","duration":40,"machine":"IRM2","priority":8,"release":15,"deadline":130,"staff_group":"TechA","setup_after":{"P3":5}},
+  {"id":"P8","duration":15,"machine":"IRM3","priority":7,"release":0,"deadline":80,"staff_group":"TechD"},
+  {"id":"P9","duration":60,"machine":"Scanner2","priority":6,"release":30,"deadline":180,"staff_group":"TechC","setup_after":{"P6":15}},
+  {"id":"P10","duration":25,"machine":"IRM3","priority":10,"release":20,"deadline":100,"staff_group":"TechD","setup_after":{"P8":5}}
+]

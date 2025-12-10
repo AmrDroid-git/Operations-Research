@@ -1,0 +1,6 @@
+[
+  {"id":"P1","duration":20,"machine":"IRM1","priority":5,"release":0,"deadline":30,"staff_group":"TechA"},
+  {"id":"P2","duration":15,"machine":"IRM1","priority":3,"release":5,"deadline":40,"staff_group":"TechA","setup_after":{"P1":5}},
+  {"id":"P3","duration":25,"machine":"Scanner1","priority":2,"release":0,"deadline":50,"staff_group":"TechB"},
+  {"id":"P4","duration":10,"machine":"Scanner1","priority":8,"release":10,"deadline":30,"staff_group":"TechB"}
+]
