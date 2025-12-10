@@ -1,0 +1,23 @@
+# Requirements
+
+
+# Shift Scheduler Requirements
+# Python 3.8+
+
+# GUI Framework
+PyQt6>=6.4.0
+
+# Optimization
+gurobipy>=10.0.0
+
+# Data handling
+numpy>=1.21.0
+pandas>=1.3.0
+
+# Optional: For enhanced exports
+openpyxl>=3.0.0  # Excel export support
+
+# Development tools (optional)
+pytest>=7.0.0
+black>=22.0.0
+
