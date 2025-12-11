@@ -5,8 +5,6 @@ from Amr_Work.calendar_dialog import CalendarDialog
 
 
 
-
-
 class AddEventDialog(QtWidgets.QDialog):
     """Small dialog to add a single event for a given date."""
 
@@ -14,81 +12,33 @@ class AddEventDialog(QtWidgets.QDialog):
         super().__init__(parent)
         self.setWindowTitle(f"Add Event for {date_str}")
         self.setModal(True)
-        self.setMinimumWidth(450)
-        self.setStyleSheet("""
-            AddEventDialog {
-                background-color: #f8f9fa;
-            }
-            QLabel {
-                color: #2c3e50;
-                font-size: 13px;
-            }
-            QLineEdit, QTimeEdit {
-                background-color: white;
-                border: 2px solid #dee2e6;
-                border-radius: 6px;
-                padding: 8px;
-                color: #2c3e50;
-                font-size: 13px;
-                selection-background-color: #1976d2;
-            }
-            QLineEdit:focus, QTimeEdit:focus {
-                border: 2px solid #1976d2;
-            }
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffffff, stop:1 #f8f9fa);
-                color: #2c3e50;
-                border: 2px solid #dee2e6;
-                border-radius: 6px;
-                padding: 10px 20px;
-                font-weight: 600;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #e9ecef, stop:1 #dee2e6);
-                border: 2px solid #1976d2;
-            }
-            QPushButton:pressed {
-                background-color: #dee2e6;
-            }
-        """)
+        self.setMinimumWidth(420)
 
         layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(25, 25, 25, 25)
-        layout.setSpacing(15)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(10)
 
-        # Info label with better styling
         info_label = QtWidgets.QLabel(f"Add a new event for date: {date_str}")
-        info_label.setStyleSheet("font-size: 14px; font-weight: 600; color: #1976d2;")
+        info_label.setStyleSheet("font-weight:600; color:#1976d2;")
         layout.addWidget(info_label)
 
-        # Form layout
         form_layout = QtWidgets.QFormLayout()
-        form_layout.setSpacing(15)
         form_layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
-        # Event name
         self.name_edit = QtWidgets.QLineEdit()
-        self.name_edit.setMinimumHeight(35)
+        self.name_edit.setMinimumHeight(32)
         form_layout.addRow("Event name:", self.name_edit)
 
-        # Duration: start & end time
         time_widget = QtWidgets.QWidget()
         time_layout = QtWidgets.QHBoxLayout(time_widget)
         time_layout.setContentsMargins(0, 0, 0, 0)
-        time_layout.setSpacing(12)
 
         self.start_time_edit = QtWidgets.QTimeEdit()
         self.start_time_edit.setDisplayFormat("HH:mm")
         self.start_time_edit.setTime(QTime(8, 0))
-        self.start_time_edit.setMinimumHeight(35)
-
         self.end_time_edit = QtWidgets.QTimeEdit()
         self.end_time_edit.setDisplayFormat("HH:mm")
         self.end_time_edit.setTime(QTime(9, 0))
-        self.end_time_edit.setMinimumHeight(35)
 
         time_layout.addWidget(QtWidgets.QLabel("Start:"))
         time_layout.addWidget(self.start_time_edit)
@@ -96,406 +46,350 @@ class AddEventDialog(QtWidgets.QDialog):
         time_layout.addWidget(self.end_time_edit)
 
         form_layout.addRow("Duration:", time_widget)
-
         layout.addLayout(form_layout)
-        layout.addSpacing(10)
 
-        # Buttons with better styling
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
-        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setMinimumHeight(40)
-        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setMinimumHeight(40)
-        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        
-        # Style OK button
-        ok_button = buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok)
-        ok_button.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #1976d2, stop:1 #1565c0);
-                color: white;
-                border: 2px solid #1565c0;
-                border-radius: 6px;
-                padding: 10px 30px;
-                font-weight: 600;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #2196f3, stop:1 #1976d2);
-            }
-            QPushButton:pressed {
-                background-color: #1565c0;
-            }
-        """)
-        
         buttons.accepted.connect(self.handle_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
     def handle_accept(self):
-        """Validate and accept dialog."""
         if not self.name_edit.text().strip():
-            QtWidgets.QMessageBox.warning(
-                self,
-                "Missing Data",
-                "Please enter an event name."
-            )
+            QtWidgets.QMessageBox.warning(self, "Missing Data", "Please enter an event name.")
             return
-
-        # (Optional) could also verify start < end here
         self.accept()
 
     def get_values(self):
-        """Return (event_name, start_str, end_str)."""
         name = self.name_edit.text().strip()
         start_str = self.start_time_edit.time().toString("HH:mm")
         end_str = self.end_time_edit.time().toString("HH:mm")
         return name, start_str, end_str
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
-        
+
+        # Set a clean system font application-wide for a modern look
+        QtWidgets.QApplication.setFont(QtGui.QFont("Segoe UI", 10))
+        # Optional: enable AA_UseHighDpiPixmaps if available (safe).
+        # Different PyQt6/PySide6 builds expose the flag under
+        # either `Qt.AA_UseHighDpiPixmaps` or `Qt.ApplicationAttribute.AA_UseHighDpiPixmaps`.
+        # Try both and ignore if unavailable.
+        try:
+            QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+        except Exception:
+            try:
+                QtWidgets.QApplication.setAttribute(
+                    QtCore.Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True
+                )
+            except Exception:
+                pass
+
         # ----- Central widget -----
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        # Global style with enhanced modern design
         self.centralwidget.setStyleSheet("""
+            /* High-Contrast Accessible Theme (Light) */
+            QWidget { background: #ffffff; }
+
+            /* Left menu: charcoal with white text */
             #leftMenu {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #1976d2, stop:1 #1565c0);
-                border-right: 4px solid #0d47a1;
+                background: #111827; /* charcoal */
+                border-right: 1px solid rgba(0,0,0,0.08);
             }
-            #mainBody {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #f5f7fa, stop:1 #ffffff);
-            }
+            /* Logo frame: light card with left accent bar and soft gradient */
             #logoFrame {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 rgba(255, 255, 255, 0.2), stop:1 rgba(255, 255, 255, 0.1));
-                border: 2px solid rgba(255, 255, 255, 0.3);
                 border-radius: 12px;
-                padding: 15px;
+                padding: 14px;
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #fbfdff, stop:1 #ffffff);
+                border: 1px solid rgba(11,18,26,0.06);
+                border-left: 6px solid #0b61d8; /* accent bar */
             }
-            #logoText {
-                background: transparent;
+            #logoText { color: #07121a; font-weight: 900; font-size: 18px; padding: 6px 8px; }
+            /* Small menu icon button inside logo frame */
+            #menuButton {
+                background: #0b61d8;
+                color: #ffffff;
+                border-radius: 8px;
+                font-weight: 900;
+                font-size: 20px;
                 border: none;
-                color: white;
+                min-width: 44px;
+                min-height: 44px;
             }
+            #menuButton:hover { background: #2b78f0; }
+
+            /* Left menu buttons - white tiles with dark text for readability */
             #leftMenu QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 rgba(255, 255, 255, 0.15), stop:1 rgba(255, 255, 255, 0.08));
-                color: white;
-                border: 2px solid rgba(255, 255, 255, 0.25);
-                border-radius: 10px;
-                padding: 12px 16px;
-                font-size: 13px;
-                font-weight: 600;
+                background: #ffffff;
+                color: #07121a;
+                border: 1px solid rgba(11,18,26,0.06);
                 text-align: left;
-                padding-left: 20px;
+                padding: 10px 14px;
+                font-size: 15px;
+                font-weight: 800;
+                border-radius: 8px;
+                margin: 6px 6px; /* spacing between buttons */
             }
             #leftMenu QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 rgba(255, 255, 255, 0.25), stop:1 rgba(255, 255, 255, 0.15));
-                border: 2px solid rgba(255, 255, 255, 0.5);
-                margin-left: 3px;
-                margin-right: -3px;
+                background: #f3f4f6;
+                border: 1px solid rgba(11,18,26,0.12);
             }
-            #leftMenu QPushButton:pressed {
-                background: rgba(255, 255, 255, 0.1);
-                margin-left: 0px;
-                margin-right: 0px;
-            }
-            #dateDisplay {
-                background-color: white;
-                border: 3px solid #1976d2;
+
+            /* Strong explicit nav button style (keeps text readable) */
+            #pushButton_5, #pushButton_6, #pushButton_7, #pushButton_8, #pushButton_9 {
+                background: transparent;
+                color: #ffffff;
                 border-radius: 8px;
-                padding: 10px;
-                font-size: 14px;
-                font-weight: bold;
-                color: #1976d2;
-                min-width: 140px;
-                max-width: 140px;
+                padding: 10px 12px;
+                font-size: 15px;
+                font-weight: 800;
+                text-align: left;
             }
-            #mainBody QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffffff, stop:1 #f8f9fa);
-                color: #2c3e50;
-                border: 2px solid #e0e0e0;
-                border-radius: 8px;
-                padding: 10px 18px;
-                font-size: 13px;
-                font-weight: 600;
-                min-height: 38px;
+            #pushButton_5:hover, #pushButton_6:hover, #pushButton_7:hover, #pushButton_8:hover, #pushButton_9:hover {
+                background: rgba(255,255,255,0.08);
             }
-            #mainBody QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #f0f0f0, stop:1 #e8e8e8);
-                border: 2px solid #1976d2;
-                color: #1976d2;
-            }
-            #mainBody QPushButton:pressed {
-                background-color: #d8d8d8;
-            }
-            #pushButton_3 {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #1976d2, stop:1 #1565c0);
-                color: white;
-                border: 2px solid #1565c0;
-            }
-            #pushButton_3:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #2196f3, stop:1 #1976d2);
-            }
-            #pushButton_2 {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #4CAF50, stop:1 #388e3c);
-                color: white;
-                border: 2px solid #388e3c;
-            }
-            #pushButton_2:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #66bb6a, stop:1 #4CAF50);
-            }
-            #pushButton_delete_selected {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ff9800, stop:1 #f57c00);
-                color: white;
-                border: 2px solid #f57c00;
-            }
-            #pushButton_delete_selected:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffb74d, stop:1 #ff9800);
-            }
-            #pushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #f44336, stop:1 #d32f2f);
-                color: white;
-                border: 2px solid #c62828;
-            }
-            #pushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ef5350, stop:1 #f44336);
-            }
-            QTableWidget {
-                border: 2px solid #e0e0e0;
+
+            /* Calendar button: bold orange tile with dark text for accessibility */
+            #pushButton_4 {
+                background: #ff7a00; /* orange */
+                color: #07121a; /* very dark for contrast */
                 border-radius: 10px;
-                background-color: white;
-                gridline-color: #f0f0f0;
-                selection-background-color: #e3f2fd;
-                selection-color: #1976d2;
+                padding: 8px 10px;
+                font-weight: 900;
+                font-size: 14px;
+            }
+            #pushButton_4:hover { background: #ff912b; }
+
+            /* Main body */
+            #mainBody { background: transparent; }
+
+            /* Date display: white card with strong border for visibility */
+            #dateDisplay {
+                background-color: #ffffff;
+                border: 2px solid #0b1726;
+                border-radius: 10px;
+                padding: 8px 12px;
+                font-size: 13px;
+                font-weight: 900;
+                color: #0b1726;
+            }
+
+            /* Main action buttons: distinct accessible accents */
+            #mainBody QPushButton {
+                border-radius: 10px;
+                padding: 10px 14px;
+                font-weight: 800;
+                color: #ffffff;
+                border: none;
+                font-size: 13px;
+            }
+            /* Refresh: blue */
+            #pushButton_3 { background: #0b61d8; }
+            #pushButton_3:hover { background: #2b78f0; }
+            /* Add Events: green */
+            #pushButton_2 { background: #16a34a; }
+            #pushButton_2:hover { background: #3ac06b; }
+            /* Delete Selected: orange tile but with dark text */
+            #pushButton_delete_selected { background: #ff7a00; color: #07121a; }
+            #pushButton_delete_selected:hover { background: #ff912b; }
+            /* Delete All: red */
+            #pushButton { background: #ef4444; }
+            #pushButton:hover { background: #f87171; }
+
+            /* Table - refined appearance */
+            QTableWidget {
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #ffffff, stop:1 #fbfdff);
+                border-radius: 12px;
+                padding: 6px;
+                gridline-color: rgba(11,18,26,0.04);
+                color: #0b1726;
             }
             QTableWidget::item {
-                padding: 12px 10px;
-                border-bottom: 1px solid #f5f5f5;
+                padding: 14px 12px;
+                border-bottom: 1px solid rgba(11,18,26,0.04);
+            }
+            QTableWidget::item:hover {
+                background: #f8fafc;
             }
             QTableWidget::item:selected {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #fde68a, stop:1 #fcd34d);
+                color: #07121a;
             }
             QHeaderView::section {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #f8f9fa, stop:1 #eef2f5);
-                padding: 13px 10px;
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #f1f5f9, stop:1 #e6eef8);
+                color: #0b1726;
+                padding: 12px 10px;
+                font-weight: 900;
                 border: none;
-                border-bottom: 4px solid #1976d2;
-                border-right: 1px solid #e0e0e0;
-                font-weight: bold;
-                font-size: 13px;
-                color: #2c3e50;
+                border-bottom: 1px solid rgba(11,18,26,0.06);
+                text-transform: none;
             }
-            QHeaderView::section:first {
-                border-top-left-radius: 8px;
-            }
-            QHeaderView::section:last {
-                border-top-right-radius: 8px;
-                border-right: none;
-            }
-            QScrollBar:vertical {
-                border: none;
-                background: #f5f5f5;
-                width: 12px;
-                margin: 0px;
-                border-radius: 6px;
-            }
-            QScrollBar::handle:vertical {
-                background: #bdbdbd;
-                min-height: 25px;
-                border-radius: 6px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #1976d2;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            #creditsFrame {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 rgba(255, 255, 255, 0.15), stop:1 rgba(255, 255, 255, 0.05));
-                border: 2px solid rgba(255, 255, 255, 0.25);
-                border-radius: 10px;
-            }
-            #creditsLabel {
-                color: white;
-                font-size: 12px;
-                font-weight: 500;
-                padding: 10px;
-            }
-            #creditsLabel:hover {
-                color: #e3f2fd;
-            }
-            #buttonsFrame {
-                background-color: transparent;
-            }
+            QTableCornerButton::section { background: transparent; }
+
+            /* Credits link in left menu */
+            #creditsLabel { color: #cfe8ff; font-weight: 700; }
+            #creditsLabel a { color: #cfe8ff; text-decoration: none; }
+
+            /* Focus outlines for keyboard users */
+            QPushButton:focus, QLineEdit:focus, QTableWidget:focus { outline: 3px solid rgba(11,23,38,0.12); }
         """)
-        
+
         # Main layout
         self.fullWindow = QtWidgets.QHBoxLayout(self.centralwidget)
         self.fullWindow.setContentsMargins(0, 0, 0, 0)
         self.fullWindow.setSpacing(0)
         self.fullWindow.setObjectName("fullWindow")
-        
+
         # ----- Left menu -----
         self.leftMenu = QtWidgets.QWidget()
         self.leftMenu.setObjectName("leftMenu")
         self.leftMenu.setMinimumWidth(200)
         self.leftMenu.setMaximumWidth(240)
-        
+
         self.leftMenuLayout = QtWidgets.QVBoxLayout(self.leftMenu)
         self.leftMenuLayout.setContentsMargins(15, 20, 15, 20)
         self.leftMenuLayout.setSpacing(12)
-        
+
         # Logo frame
         self.frame = QtWidgets.QFrame()
         self.frame.setObjectName("logoFrame")
         self.frame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
-        self.frame.setMinimumHeight(110)
-        self.frame.setMaximumHeight(130)
-        
+        self.frame.setMinimumHeight(120)
+        self.frame.setMaximumHeight(160)
+
         self.logoLayout = QtWidgets.QVBoxLayout(self.frame)
-        self.logoLayout.setContentsMargins(15, 15, 15, 15)
-        
-        self.label = QtWidgets.QTextEdit()
-        self.label.setObjectName("logoText")
-        self.label.setHtml("""
-            <div style="text-align: center; font-size: 18px; font-weight: bold; 
-                        color: white; line-height: 1.4; font-family: 'Segoe UI', Arial;">
-                📅<br>Events<br>Management
-            </div>
-        """)
-        self.label.setReadOnly(True)
-        self.label.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.label.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.label.setFixedHeight(90)
-        self.logoLayout.addWidget(self.label)
-        
+        self.logoLayout.setContentsMargins(12, 12, 12, 12)
+
+        # Replace logo label with a compact menu icon button to indicate the sidebar
+        self.menuButton = QtWidgets.QPushButton()
+        self.menuButton.setObjectName("menuButton")
+        self.menuButton.setText("☰")
+        self.menuButton.setToolTip("Menu")
+        self.menuButton.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.menuButton.setFixedSize(48, 48)
+        self.menuButton.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        # center the button in the logo frame
+        self.logoLayout.addStretch()
+        self.logoLayout.addWidget(self.menuButton, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.logoLayout.addStretch()
+
+        # subtle shadow under logo frame to add depth
+        logo_shadow = QtWidgets.QGraphicsDropShadowEffect(self.frame)
+        logo_shadow.setBlurRadius(28)
+        logo_shadow.setOffset(0, 8)
+        logo_shadow.setColor(QtGui.QColor(3, 18, 36, 90))
+        self.frame.setGraphicsEffect(logo_shadow)
+
         # Buttons frame
         self.frame_2 = QtWidgets.QFrame()
         self.frame_2.setObjectName("buttonsFrame")
         self.frame_2.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
-        
+
         self.buttonsLayout = QtWidgets.QVBoxLayout(self.frame_2)
         self.buttonsLayout.setContentsMargins(0, 8, 0, 8)
         self.buttonsLayout.setSpacing(8)
-        
+
         self.pushButton_4 = QtWidgets.QPushButton()
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setMinimumHeight(40)
         self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_4.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_4)
-        
+
         self.pushButton_7 = QtWidgets.QPushButton()
         self.pushButton_7.setObjectName("pushButton_7")
         self.pushButton_7.setMinimumHeight(40)
         self.pushButton_7.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_7.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_7)
-        
+
         self.pushButton_6 = QtWidgets.QPushButton()
         self.pushButton_6.setObjectName("pushButton_6")
         self.pushButton_6.setMinimumHeight(40)
         self.pushButton_6.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_6.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_6)
-        
+
         self.pushButton_5 = QtWidgets.QPushButton()
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setMinimumHeight(40)
         self.pushButton_5.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_5.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_5)
-        
+
         self.pushButton_8 = QtWidgets.QPushButton()
         self.pushButton_8.setObjectName("pushButton_8")
         self.pushButton_8.setMinimumHeight(40)
         self.pushButton_8.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_8.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_8)
-        
+
         self.pushButton_9 = QtWidgets.QPushButton()
         self.pushButton_9.setObjectName("pushButton_9")
         self.pushButton_9.setMinimumHeight(40)
         self.pushButton_9.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.pushButton_9.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttonsLayout.addWidget(self.pushButton_9)
-        
+
         self.buttonsLayout.addStretch()
-        
+
         # Credits frame
         self.creditsFrame = QtWidgets.QFrame()
         self.creditsFrame.setObjectName("creditsFrame")
         self.creditsFrame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.creditsFrame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
-        
+
         self.creditsLayout = QtWidgets.QVBoxLayout(self.creditsFrame)
         self.creditsLayout.setContentsMargins(12, 12, 12, 12)
-        
+
         self.label_2 = QtWidgets.QLabel()
         self.label_2.setObjectName("creditsLabel")
-        self.label_2.setText(
-            '<a href="https://github.com/AmrDroid-git" style="color: white; text-decoration: none;">'
-            '💻 Created By AmrDroid</a>'
-        )
+        # Text/links styled via stylesheet for consistency
+        self.label_2.setText('<a href="https://github.com/AmrDroid-git">💻 Created By AmrDroid</a>')
         self.label_2.setOpenExternalLinks(True)
         self.label_2.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_2.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.creditsLayout.addWidget(self.label_2)
-        
+
         self.leftMenuLayout.addWidget(self.frame)
         self.leftMenuLayout.addWidget(self.frame_2)
         self.leftMenuLayout.addStretch()
         self.leftMenuLayout.addWidget(self.creditsFrame)
-        
+
         # ----- Main body -----
         self.mainBody = QtWidgets.QWidget()
         self.mainBody.setObjectName("mainBody")
-        
+
         self.mainBodyLayout = QtWidgets.QVBoxLayout(self.mainBody)
         self.mainBodyLayout.setContentsMargins(25, 25, 25, 25)
         self.mainBodyLayout.setSpacing(15)
-        
+
         # Top bar: date + buttons
         self.buttons_Add_Delete_refresh = QtWidgets.QHBoxLayout()
         self.buttons_Add_Delete_refresh.setSpacing(10)
-        
+
         self.date_display = QtWidgets.QLineEdit()
         self.date_display.setObjectName("dateDisplay")
         self.date_display.setFixedWidth(150)
         self.date_display.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.date_display.setReadOnly(True)
         self.buttons_Add_Delete_refresh.addWidget(self.date_display)
-        
+
         self.pushButton_3 = QtWidgets.QPushButton()
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_3.setMinimumWidth(110)
         self.pushButton_3.setMinimumHeight(38)
         self.pushButton_3.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.buttons_Add_Delete_refresh.addWidget(self.pushButton_3)
-        
+
         self.pushButton_2 = QtWidgets.QPushButton()
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setMinimumWidth(120)
@@ -510,16 +404,16 @@ class Ui_MainWindow(object):
         self.pushButton_delete_selected.setMinimumHeight(38)
         self.pushButton_delete_selected.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.buttons_Add_Delete_refresh.addWidget(self.pushButton_delete_selected)
-        
+
         self.pushButton = QtWidgets.QPushButton()
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setMinimumWidth(150)
         self.pushButton.setMinimumHeight(38)
         self.pushButton.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.buttons_Add_Delete_refresh.addWidget(self.pushButton)
-        
+
         self.buttons_Add_Delete_refresh.addStretch()
-        
+
         # Table
         self.tableWidget = QtWidgets.QTableWidget()
         self.tableWidget.setObjectName("tableWidget")
@@ -531,30 +425,39 @@ class Ui_MainWindow(object):
         self.tableWidget.setShowGrid(True)
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.setMinimumHeight(300)
-        
+
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(2, item)
-        
+
         header = self.tableWidget.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        
+
         self.tableWidget.setColumnWidth(0, 200)
         self.tableWidget.setColumnWidth(1, 120)
         self.tableWidget.setColumnWidth(2, 100)
-        
+
+        # Make table rows and headers visually nicer
+        self.tableWidget.setShowGrid(False)
+        self.tableWidget.setAlternatingRowColors(True)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(46)
+        header.setMinimumHeight(48)
+        header.setStretchLastSection(True)
+        self.tableWidget.setWordWrap(False)
+
         self.mainBodyLayout.addLayout(self.buttons_Add_Delete_refresh)
         self.mainBodyLayout.addWidget(self.tableWidget)
-        
+
         # Put both sides into main layout
         self.fullWindow.addWidget(self.leftMenu, 1)
         self.fullWindow.addWidget(self.mainBody, 4)
-        
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         # Translate texts
@@ -779,9 +682,6 @@ class Ui_MainWindow(object):
                     )
                     return
 
-        # ---------------------------------------------------------
-        # 1. Convert "HH:mm -> HH:mm" into numeric intervals
-        # ---------------------------------------------------------
         def parse_time(t):
                     h, m = t.split(":")
                     return int(h) + int(m) / 60
@@ -795,9 +695,6 @@ class Ui_MainWindow(object):
 
         V = list(event_times.keys())
 
-        # ---------------------------------------------------------
-        # 2. Build conflict graph
-        # ---------------------------------------------------------
         def overlap(ev1, ev2):
                     s1, e1 = ev1
                     s2, e2 = ev2
@@ -809,10 +706,7 @@ class Ui_MainWindow(object):
                     if overlap(event_times[u], event_times[v]):
                             E.append((u, v))
 
-        # ---------------------------------------------------------
-        # 3. Greedy Graph Coloring (no Gurobi required)
-        # ---------------------------------------------------------
-        colors = {}   # event -> color index
+        colors = {}
 
         for v in V:
                     forbidden = set()
@@ -828,25 +722,16 @@ class Ui_MainWindow(object):
 
                     colors[v] = c
 
-        # ---------------------------------------------------------
-        # 4. Convert colors to classes A1, A2, A3 ...
-        # ---------------------------------------------------------
         color_to_class = {}
         for c in set(colors.values()):
                     color_to_class[c] = f"A{c + 1}"
 
-        # ---------------------------------------------------------
-        # 5. Write new classes back into JSON
-        # ---------------------------------------------------------
         for e in events:
                     e["class"] = color_to_class[colors[e["event"]]]
 
         self.events_backend.all_events_data[date_str] = events
         self.events_backend.save_json_data()
 
-        # ---------------------------------------------------------
-        # 6. Reload table
-        # ---------------------------------------------------------
         self.load_events_for_current_date()
 
         QtWidgets.QMessageBox.information(

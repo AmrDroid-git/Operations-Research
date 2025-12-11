@@ -16,6 +16,16 @@ class ModernCalendarDialog(QtWidgets.QDialog):
         
         self.selected_date = current_date if current_date else QDate.currentDate()
         
+        # slight drop shadow for dialog to float above content
+        shadow = QtWidgets.QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(20)
+        shadow.setOffset(0, 8)
+        shadow.setColor(QtGui.QColor(10, 25, 55, 90))
+        self.setGraphicsEffect(shadow)
+        
+        # stronger header font for clarity
+        self._header_font = QtGui.QFont("Segoe UI", 12, QtGui.QFont.Weight.DemiBold)
+        
         self.setup_ui()
         self.apply_styles()
     
@@ -26,6 +36,7 @@ class ModernCalendarDialog(QtWidgets.QDialog):
         
         # Header label
         self.date_label = QLabel(self.selected_date.toString("dddd, MMMM d, yyyy"))
+        self.date_label.setFont(getattr(self, "_header_font", QtGui.QFont("Segoe UI", 12)))
         self.date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.date_label.setObjectName("dateLabel")
         main_layout.addWidget(self.date_label)
