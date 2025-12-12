@@ -1,0 +1,285 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+
+\geometry{margin=2.5cm}
+
+\title{\textbf{Système de Gestion d'Événements avec Résolution de Conflits Temporels}}
+\author{AmrDroid}
+\date{\today}
+
+\begin{document}
+
+\pagestyle{empty}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Ce rapport présente un système de gestion d'événements développé avec PyQt6 qui intègre un solveur d'optimisation pour résoudre les conflits de temps entre événements. Le système permet aux utilisateurs de créer, gérer et organiser des événements quotidiens tout en assignant automatiquement des classes non-conflictuelles aux événements qui se chevauchent.
+
+\section{Interface Utilisateur (UI)}
+
+\subsection{Architecture de l'Interface}
+
+L'interface utilisateur est divisée en deux sections principales :
+
+\begin{itemize}
+    \item \textbf{Menu latéral gauche} : Navigation temporelle (aujourd'hui, hier, demain, etc.) et accès au calendrier
+    \item \textbf{Corps principal} : Affichage de la date courante, table des événements, et boutons d'action
+\end{itemize}
+
+\subsection{Fonctionnalités Principales}
+
+\begin{enumerate}
+    \item \textbf{Navigation temporelle} : Boutons pour naviguer rapidement entre les jours
+    \item \textbf{Calendrier interactif} : Sélection de dates via une interface calendrier moderne
+    \item \textbf{Gestion d'événements} :
+    \begin{itemize}
+        \item Ajout d'événements avec nom et durée (heure début → heure fin)
+        \item Suppression d'événements sélectionnés
+        \item Suppression de tous les événements d'une date
+    \end{itemize}
+    \item \textbf{Résolution automatique de conflits} : Bouton "Refresh" qui lance l'algorithme d'optimisation
+\end{enumerate}
+
+\subsection{Design et Accessibilité}
+
+L'interface utilise un thème à contraste élevé avec :
+\begin{itemize}
+    \item Palette de couleurs accessible (bleu \#0b61d8, vert \#16a34a, orange \#ff7a00, rouge \#ef4444)
+    \item Typographie claire (Segoe UI, tailles 10-18px)
+    \item Indicateurs de focus pour la navigation au clavier
+    \item Boutons avec curseur pointeur et effets de survol
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{ui_screenshot.png}
+    \caption{Interface principale du système de gestion d'événements}
+    \label{fig:ui_main}
+\end{figure}
+
+\section{Modélisation Mathématique}
+
+\subsection{Problème de Coloration de Graphe}
+
+Le problème de résolution de conflits temporels est modélisé comme un \textbf{problème de coloration de graphe optimal}.
+
+\subsubsection{Définitions}
+
+Soit :
+\begin{itemize}
+    \item $V = \{v_1, v_2, \ldots, v_n\}$ l'ensemble des événements
+    \item $t_i = (s_i, e_i)$ la durée de l'événement $v_i$ avec $s_i$ = heure de début et $e_i$ = heure de fin
+    \item $K$ le nombre maximum de couleurs (classes) disponibles, où $K = |V|$
+\end{itemize}
+
+\subsubsection{Graphe de Conflits}
+
+Construisons un graphe $G = (V, E)$ où :
+\begin{equation}
+    (v_i, v_j) \in E \iff \text{les événements } v_i \text{ et } v_j \text{ se chevauchent}
+\end{equation}
+
+Deux événements se chevauchent si et seulement si :
+\begin{equation}
+    (s_i < e_j) \land (s_j < e_i)
+\end{equation}
+
+\subsubsection{Formulation en Programmation Linéaire en Nombres Entiers}
+
+\textbf{Variables de décision :}
+\begin{align}
+    x_{vk} &\in \{0, 1\} \quad \forall v \in V, k \in \{0, 1, \ldots, K-1\} \\
+    &\quad x_{vk} = 1 \text{ si l'événement } v \text{ reçoit la couleur } k \\
+    y_k &\in \{0, 1\} \quad \forall k \in \{0, 1, \ldots, K-1\} \\
+    &\quad y_k = 1 \text{ si la couleur } k \text{ est utilisée}
+\end{align}
+
+\textbf{Fonction objectif :}
+\begin{equation}
+    \min \sum_{k=0}^{K-1} y_k
+\end{equation}
+
+\textbf{Contraintes :}
+
+1. Chaque événement reçoit exactement une couleur :
+\begin{equation}
+    \sum_{k=0}^{K-1} x_{vk} = 1 \quad \forall v \in V
+\end{equation}
+
+2. Liaison entre $x$ et $y$ :
+\begin{equation}
+    x_{vk} \leq y_k \quad \forall v \in V, k \in \{0, 1, \ldots, K-1\}
+\end{equation}
+
+3. Événements adjacents (conflictuels) ne peuvent pas partager la même couleur :
+\begin{equation}
+    x_{uk} + x_{vk} \leq y_k \quad \forall (u, v) \in E, k \in \{0, 1, \ldots, K-1\}
+\end{equation}
+
+\subsection{Résolution avec Gurobi}
+
+Le modèle est résolu en utilisant Gurobi Optimizer, un solveur commercial de programmation linéaire en nombres entiers qui garantit l'optimalité de la solution.
+
+\section{Exemple Pratique}
+
+\subsection{Données d'Entrée}
+
+Considérons une journée avec 5 événements :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Événement} & \textbf{Début} & \textbf{Fin} \\
+\hline
+Réunion A & 08:00 & 10:00 \\
+Cours B & 09:00 & 11:00 \\
+Présentation C & 10:30 & 12:00 \\
+Déjeuner D & 12:00 & 13:00 \\
+Atelier E & 09:30 & 10:30 \\
+\hline
+\end{tabular}
+\caption{Événements avec leurs durées}
+\label{tab:events}
+\end{table}
+
+\subsection{Construction du Graphe de Conflits}
+
+\textbf{Conversion en valeurs numériques :}
+\begin{align}
+    \text{Réunion A:} &\quad [8.0, 10.0] \\
+    \text{Cours B:} &\quad [9.0, 11.0] \\
+    \text{Présentation C:} &\quad [10.5, 12.0] \\
+    \text{Déjeuner D:} &\quad [12.0, 13.0] \\
+    \text{Atelier E:} &\quad [9.5, 10.5]
+\end{align}
+
+\textbf{Détection des chevauchements :}
+
+\begin{itemize}
+    \item A et B se chevauchent : $(8.0 < 11.0) \land (9.0 < 10.0)$ ✓
+    \item A et E se chevauchent : $(8.0 < 10.5) \land (9.5 < 10.0)$ ✓
+    \item B et C se chevauchent : $(9.0 < 12.0) \land (10.5 < 11.0)$ ✓
+    \item B et E se chevauchent : $(9.0 < 10.5) \land (9.5 < 11.0)$ ✓
+    \item C et E se chevauchent : $(10.5 = 10.5)$ ✗ (juste adjacent)
+    \item C et D ne se chevauchent pas : $(12.0 \not< 12.0)$ ✗
+\end{itemize}
+
+\textbf{Arêtes du graphe :}
+\begin{equation}
+    E = \{(A,B), (A,E), (B,C), (B,E)\}
+\end{equation}
+
+\subsection{Résolution Optimale}
+
+Le solveur Gurobi trouve la solution optimale avec \textbf{3 couleurs} :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Événement} & \textbf{Couleur} & \textbf{Classe} \\
+\hline
+Réunion A & 0 & A1 \\
+Cours B & 1 & A2 \\
+Présentation C & 0 & A1 \\
+Déjeuner D & 0 & A1 \\
+Atelier E & 2 & A3 \\
+\hline
+\end{tabular}
+\caption{Assignation optimale des classes}
+\label{tab:solution}
+\end{table}
+
+\subsection{Vérification de la Solution}
+
+\textbf{Classe A1} (Réunion A, Présentation C, Déjeuner D) :
+\begin{itemize}
+    \item A [8:00-10:00] et C [10:30-12:00] : pas de chevauchement ✓
+    \item C [10:30-12:00] et D [12:00-13:00] : pas de chevauchement ✓
+    \item A [8:00-10:00] et D [12:00-13:00] : pas de chevauchement ✓
+\end{itemize}
+
+\textbf{Classe A2} (Cours B uniquement) : pas de conflit interne ✓
+
+\textbf{Classe A3} (Atelier E uniquement) : pas de conflit interne ✓
+
+\textbf{Optimalité :} Il est impossible de réduire à 2 couleurs car le sous-graphe $\{A, B, E\}$ forme un triangle (clique de taille 3).
+
+\section{Analyse de la Solution}
+
+\subsection{Complexité Algorithmique}
+
+\begin{itemize}
+    \item \textbf{Construction du graphe :} $O(n^2)$ où $n = |V|$ (comparaison de toutes les paires)
+    \item \textbf{Résolution PLNE :} NP-difficile en théorie générale, mais Gurobi utilise des heuristiques et du branch-and-bound pour une résolution efficace en pratique
+    \item \textbf{Pour notre cas d'usage :} Avec $n \leq 50$ événements par jour, le temps de calcul reste inférieur à 1 seconde
+\end{itemize}
+
+\subsection{Avantages de l'Approche}
+
+\begin{enumerate}
+    \item \textbf{Optimalité garantie :} Nombre minimal de classes utilisées
+    \item \textbf{Flexibilité :} S'adapte automatiquement à n'importe quelle configuration d'événements
+    \item \textbf{Scalabilité :} Gurobi gère efficacement des instances de taille modérée
+    \item \textbf{Robustesse :} Gère les cas particuliers (aucun conflit, conflits complets, etc.)
+\end{enumerate}
+
+\subsection{Interprétation Pratique}
+
+Dans le contexte de gestion d'événements :
+\begin{itemize}
+    \item \textbf{Classe A1} pourrait représenter une salle de conférence
+    \item \textbf{Classe A2} pourrait représenter une salle de cours
+    \item \textbf{Classe A3} pourrait représenter un atelier
+\end{itemize}
+
+Le système minimise le nombre de ressources (salles, équipes, etc.) nécessaires pour organiser tous les événements sans conflit temporel.
+
+\subsection{Limitations et Extensions Possibles}
+
+\textbf{Limitations actuelles :}
+\begin{itemize}
+    \item Nécessite l'installation de Gurobi (licence commerciale ou académique)
+    \item Pas de contraintes de préférences ou de priorités entre événements
+\end{itemize}
+
+\textbf{Extensions possibles :}
+\begin{enumerate}
+    \item Ajouter des poids aux événements pour prioriser certaines assignations
+    \item Implémenter des heuristiques alternatives (algorithme glouton) pour une version sans Gurobi
+    \item Permettre des contraintes de pré-assignation (forcer certains événements dans des classes spécifiques)
+    \item Visualisation graphique du graphe de conflits
+    \item Export des plannings par classe au format PDF ou calendrier
+\end{enumerate}
+
+\section{Conclusion}
+
+Ce système de gestion d'événements combine une interface utilisateur moderne et accessible avec un algorithme d'optimisation mathématique rigoureux. L'utilisation de la coloration de graphe optimale via Gurobi garantit une utilisation minimale des ressources tout en évitant les conflits temporels.
+
+Le système est particulièrement adapté pour :
+\begin{itemize}
+    \item La planification de salles de réunion
+    \item L'organisation d'emplois du temps académiques
+    \item La gestion de ressources partagées
+    \item La coordination d'équipes multiples
+\end{itemize}
+
+L'approche modulaire du code (séparation UI/Backend/Optimisation) facilite la maintenance et l'extension future du système.
+
+\end{document}
