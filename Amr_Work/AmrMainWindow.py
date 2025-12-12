@@ -2,6 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QDate, QTime
 from Amr_Work.events_backend import EventsBackend
 from Amr_Work.calendar_dialog import CalendarDialog
+from gurobipy import Model, GRB, quicksum
 
 
 
@@ -667,77 +668,87 @@ class Ui_MainWindow(object):
 
     def solve_and_assign_classes_for_day(self):
         """Solve time conflicts and assign new classes A1, A2, ... for this day."""
-        
         date_str = self.date_display.text()
         if not date_str:
-                    return
+            return
 
         events = self.events_backend.all_events_data.get(date_str, [])
-
         if not events:
-                    QtWidgets.QMessageBox.information(
-                            None,
-                            "No Events",
-                            "No events found for this day to solve."
-                    )
-                    return
+            QtWidgets.QMessageBox.information(
+                None, "No Events", "No events found for this day to solve."
+            )
+            return
 
+        # ---------- 1. parse durations -> numeric intervals ----------
         def parse_time(t):
-                    h, m = t.split(":")
-                    return int(h) + int(m) / 60
+            h, m = t.split(":")
+            return int(h) + int(m) / 60
 
         event_times = {}
         for e in events:
-                    start_str, end_str = e["duration"].split(" -> ")
-                    start = parse_time(start_str)
-                    end = parse_time(end_str)
-                    event_times[e["event"]] = (start, end)
+            start_str, end_str = e["duration"].split(" -> ")
+            start = parse_time(start_str)
+            end = parse_time(end_str)
+            event_times[e["event"]] = (start, end)
 
         V = list(event_times.keys())
 
+        # ---------- 2. build conflict graph ----------
         def overlap(ev1, ev2):
-                    s1, e1 = ev1
-                    s2, e2 = ev2
-                    return (s1 < e2) and (s2 < e1)
+            s1, e1 = ev1
+            s2, e2 = ev2
+            return (s1 < e2) and (s2 < e1)
 
         E = []
         from itertools import combinations
         for u, v in combinations(V, 2):
-                    if overlap(event_times[u], event_times[v]):
-                            E.append((u, v))
+            if overlap(event_times[u], event_times[v]):
+                E.append((u, v))
 
-        colors = {}
+        # ---------- 3. OPTIMAL colouring with Gurobi ----------
+        K = len(V)  # upper bound on colours
+        m = Model("colour")
+        m.Params.OutputFlag = 0  # silent
 
+        # x[v,k] = 1 if vertex v gets colour k
+        x = m.addVars(V, range(K), vtype=GRB.BINARY, name="x")
+        # y[k] = 1 if colour k is used
+        y = m.addVars(range(K), vtype=GRB.BINARY, name="y")
+
+        # each event gets exactly one colour
+        m.addConstrs((quicksum(x[v, k] for k in range(K)) == 1 for v in V), name="assign")
+
+        # link x to y
+        m.addConstrs((x[v, k] <= y[k] for v in V for k in range(K)), name="link")
+
+        # adjacent vertices cannot share a colour
+        for u, v in E:
+            for k in range(K):
+                m.addConstr(x[u, k] + x[v, k] <= y[k], name=f"conflict_{u}_{v}_{k}")
+
+        m.setObjective(quicksum(y[k] for k in range(K)), GRB.MINIMIZE)
+        m.optimize()
+
+        # ---------- 4. read solution ----------
+        colours = {}
         for v in V:
-                    forbidden = set()
-                    for (u, w) in E:
-                            if u == v and w in colors:
-                                        forbidden.add(colors[w])
-                            if w == v and u in colors:
-                                        forbidden.add(colors[u])
+            colours[v] = next(k for k in range(K) if x[v, k].X > 0.5)
 
-                    c = 0
-                    while c in forbidden:
-                            c += 1
-
-                    colors[v] = c
-
-        color_to_class = {}
-        for c in set(colors.values()):
-                    color_to_class[c] = f"A{c + 1}"
+        # ---------- 5. map colours -> class labels ----------
+        # Create mapping from used colors (0, 1, 2, ...) to class labels (A1, A2, A3, ...)
+        used_colors = sorted(set(c for c in range(K) if y[c].X > 0.5))
+        colour_to_class = {used_colors[i]: f"A{i+1}" for i in range(len(used_colors))}
 
         for e in events:
-                    e["class"] = color_to_class[colors[e["event"]]]
+            e["class"] = colour_to_class[colours[e["event"]]]
 
+        # ---------- 6. save & reload ----------
         self.events_backend.all_events_data[date_str] = events
         self.events_backend.save_json_data()
-
         self.load_events_for_current_date()
 
         QtWidgets.QMessageBox.information(
-                    None,
-                    "Solved",
-                    "Classes were reassigned successfully using conflict solving."
+            None, "Solved", "Classes were reassigned successfully using conflict solving."
         )
 
 

@@ -1,12 +1,11 @@
 {
   "events": [
     {
-      "date": "2025-12-10",
+      "date": "2025-12-12",
       "events": [
         {
           "event": "Early Reading",
           "duration": "06:30 -> 07:30",
-          "salle": "A null",
           "class": "A1"
         },
         {
@@ -17,12 +16,12 @@
         {
           "event": "Physics",
           "duration": "08:30 -> 10:00",
-          "class": "A2"
+          "class": "A1"
         },
         {
           "event": "Chemistry",
           "duration": "09:00 -> 11:00",
-          "class": "A3"
+          "class": "A1"
         },
         {
           "event": "History",
@@ -32,18 +31,17 @@
         {
           "event": "Geography",
           "duration": "10:30 -> 12:00",
-          "class": "A2"
+          "class": "A1"
         },
         {
           "event": "Lunch Prep",
           "duration": "11:30 -> 12:30",
-          "salle": "A null",
           "class": "A1"
         },
         {
           "event": "CS Lab",
           "duration": "12:00 -> 14:00",
-          "class": "A2"
+          "class": "A1"
         },
         {
           "event": "Robotics",
@@ -53,7 +51,7 @@
         {
           "event": "Art",
           "duration": "14:00 -> 15:00",
-          "class": "A2"
+          "class": "A1"
         },
         {
           "event": "Music",
@@ -63,130 +61,12 @@
         {
           "event": "Study Hall",
           "duration": "16:00 -> 17:30",
-          "salle": "A null",
           "class": "A1"
         },
         {
           "event": "Late Lab",
           "duration": "18:00 -> 19:30",
-          "salle": "A null",
           "class": "A1"
-        }
-      ]
-    },
-    {
-      "date": "2025-12-08",
-      "events": [
-        {
-          "event": "Morning Jog",
-          "duration": "06:00 -> 07:00",
-          "salle": "A null",
-          "class": "A null"
-        },
-        {
-          "event": "Team Meeting",
-          "duration": "08:00 -> 09:00",
-          "class": "A null"
-        },
-        {
-          "event": "Daily Standup",
-          "duration": "08:15 -> 09:15",
-          "class": "A null"
-        },
-        {
-          "event": "Client Call",
-          "duration": "08:30 -> 10:00",
-          "class": "A null"
-        },
-        {
-          "event": "Backend Dev",
-          "duration": "09:30 -> 11:00",
-          "class": "A null"
-        },
-        {
-          "event": "Frontend Dev",
-          "duration": "10:00 -> 12:00",
-          "class": "A null"
-        },
-        {
-          "event": "Database Work",
-          "duration": "11:30 -> 13:00",
-          "class": "A null"
-        },
-        {
-          "event": "API Testing",
-          "duration": "12:00 -> 14:00",
-          "class": "A null"
-        },
-        {
-          "event": "UI Review",
-          "duration": "14:00 -> 15:00",
-          "class": "A null"
-        },
-        {
-          "event": "UX Review",
-          "duration": "14:20 -> 16:00",
-          "class": "A null"
-        },
-        {
-          "event": "Retrospective",
-          "duration": "16:15 -> 17:15",
-          "salle": "A null",
-          "class": "A null"
-        },
-        {
-          "event": "Night Deploy",
-          "duration": "19:00 -> 20:00",
-          "salle": "A null",
-          "class": "A null"
-        }
-      ]
-    },
-    {
-      "date": "2025-12-09",
-      "events": [
-        {
-          "event": "Warm-up Drills",
-          "duration": "07:00 -> 07:45",
-          "salle": "A null",
-          "class": "A null"
-        },
-        {
-          "event": "test1",
-          "duration": "08:00 -> 12:00",
-          "class": "A null"
-        },
-        {
-          "event": "test2",
-          "duration": "12:00 -> 14:00",
-          "class": "A null"
-        },
-        {
-          "event": "test3",
-          "duration": "08:00 -> 09:00",
-          "class": "A null"
-        },
-        {
-          "event": "test4",
-          "duration": "08:00 -> 12:00",
-          "class": "A null"
-        },
-        {
-          "event": "Feedback Session",
-          "duration": "14:15 -> 15:15",
-          "salle": "A null",
-          "class": "A null"
-        },
-        {
-          "event": "Cleanup",
-          "duration": "17:00 -> 18:00",
-          "salle": "A null",
-          "class": "A null"
-        },
-        {
-          "event": "ghgfh",
-          "duration": "08:00 -> 09:00",
-          "class": "A null"
         }
       ]
     }
