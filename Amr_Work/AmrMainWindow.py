@@ -13,46 +13,112 @@ class AddEventDialog(QtWidgets.QDialog):
         super().__init__(parent)
         self.setWindowTitle(f"Add Event for {date_str}")
         self.setModal(True)
-        self.setMinimumWidth(420)
+        self.setMinimumWidth(400)
+        self.setMinimumHeight(280)
+        self.resize(400, 280)
 
         layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(16, 16, 16, 16)
-        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
 
         info_label = QtWidgets.QLabel(f"Add a new event for date: {date_str}")
-        info_label.setStyleSheet("font-weight:600; color:#1976d2;")
+        info_label.setStyleSheet("font-weight:700; color:#1e3a8a; font-size:15px;")
         layout.addWidget(info_label)
 
         form_layout = QtWidgets.QFormLayout()
         form_layout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        form_layout.setSpacing(12)
 
         self.name_edit = QtWidgets.QLineEdit()
-        self.name_edit.setMinimumHeight(32)
+        self.name_edit.setMinimumHeight(36)
+        self.name_edit.setStyleSheet("""
+            QLineEdit {
+                border: 2px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+            QLineEdit:focus {
+                border: 2px solid #2563eb;
+                background: #f0f7ff;
+            }
+        """)
+        self.name_edit.setPlaceholderText("Enter event name")
         form_layout.addRow("Event name:", self.name_edit)
 
         time_widget = QtWidgets.QWidget()
         time_layout = QtWidgets.QHBoxLayout(time_widget)
         time_layout.setContentsMargins(0, 0, 0, 0)
+        time_layout.setSpacing(10)
 
         self.start_time_edit = QtWidgets.QTimeEdit()
         self.start_time_edit.setDisplayFormat("HH:mm")
         self.start_time_edit.setTime(QTime(8, 0))
+        self.start_time_edit.setMinimumHeight(36)
+        self.start_time_edit.setStyleSheet("""
+            QTimeEdit {
+                border: 2px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 4px 8px;
+                font-size: 13px;
+            }
+            QTimeEdit:focus {
+                border: 2px solid #2563eb;
+                background: #f0f7ff;
+            }
+        """)
+        
         self.end_time_edit = QtWidgets.QTimeEdit()
         self.end_time_edit.setDisplayFormat("HH:mm")
         self.end_time_edit.setTime(QTime(9, 0))
+        self.end_time_edit.setMinimumHeight(36)
+        self.end_time_edit.setStyleSheet("""
+            QTimeEdit {
+                border: 2px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 4px 8px;
+                font-size: 13px;
+            }
+            QTimeEdit:focus {
+                border: 2px solid #2563eb;
+                background: #f0f7ff;
+            }
+        """)
 
         time_layout.addWidget(QtWidgets.QLabel("Start:"))
         time_layout.addWidget(self.start_time_edit)
         time_layout.addWidget(QtWidgets.QLabel("End:"))
         time_layout.addWidget(self.end_time_edit)
+        time_layout.addStretch()
 
         form_layout.addRow("Duration:", time_widget)
         layout.addLayout(form_layout)
+        
+        layout.addStretch()
 
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Ok |
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
+        buttons.setStyleSheet("""
+            QDialogButtonBox {
+                background: transparent;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #2563eb, stop:1 #1e40af);
+                color: #ffffff;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 20px;
+                font-weight: 600;
+                font-size: 13px;
+                min-width: 80px;
+                min-height: 36px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #3b82f6, stop:1 #2563eb);
+            }
+        """)
         buttons.accepted.connect(self.handle_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -98,74 +164,85 @@ class Ui_MainWindow(object):
             /* High-Contrast Accessible Theme (Light) */
             QWidget { background: #ffffff; }
 
-            /* Left menu: charcoal with white text */
+            /* Left menu: Modern gradient blue-purple background */
             #leftMenu {
-                background: #111827; /* charcoal */
-                border-right: 1px solid rgba(0,0,0,0.08);
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, 
+                    stop:0 #1e3a8a, stop:0.5 #2563eb, stop:1 #3b82f6);
+                border-right: 2px solid #1e40af;
             }
-            /* Logo frame: light card with left accent bar and soft gradient */
+            /* Logo frame: sleek dark blue card with vibrant accent */
             #logoFrame {
                 border-radius: 12px;
                 padding: 14px;
-                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #fbfdff, stop:1 #ffffff);
-                border: 1px solid rgba(11,18,26,0.06);
-                border-left: 6px solid #0b61d8; /* accent bar */
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #1e3a8a, stop:1 #2563eb);
+                border: 2px solid #3b82f6;
+                border-left: 8px solid #60a5fa; /* vibrant accent bar */
             }
-            #logoText { color: #07121a; font-weight: 900; font-size: 18px; padding: 6px 8px; }
+            #logoText { color: #ffffff; font-weight: 900; font-size: 18px; padding: 6px 8px; }
             /* Small menu icon button inside logo frame */
             #menuButton {
-                background: #0b61d8;
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #60a5fa, stop:1 #3b82f6);
                 color: #ffffff;
-                border-radius: 8px;
+                border-radius: 10px;
                 font-weight: 900;
-                font-size: 20px;
-                border: none;
-                min-width: 44px;
-                min-height: 44px;
+                font-size: 24px;
+                border: 2px solid #93c5fd;
+                min-width: 54px;
+                min-height: 54px;
             }
-            #menuButton:hover { background: #2b78f0; }
+            #menuButton:hover { 
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #93c5fd, stop:1 #60a5fa);
+                border: 2px solid #bfdbfe;
+            }
 
-            /* Left menu buttons - white tiles with dark text for readability */
+            /* Left menu buttons - vibrant colored tiles */
             #leftMenu QPushButton {
-                background: #ffffff;
-                color: #07121a;
-                border: 1px solid rgba(11,18,26,0.06);
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #3b82f6, stop:1 #2563eb);
+                color: #ffffff;
+                border: 2px solid #60a5fa;
                 text-align: left;
-                padding: 10px 14px;
-                font-size: 15px;
-                font-weight: 800;
-                border-radius: 8px;
-                margin: 6px 6px; /* spacing between buttons */
+                padding: 12px 16px;
+                font-size: 14px;
+                font-weight: 700;
+                border-radius: 10px;
+                margin: 8px 8px;
             }
             #leftMenu QPushButton:hover {
-                background: #f3f4f6;
-                border: 1px solid rgba(11,18,26,0.12);
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #60a5fa, stop:1 #3b82f6);
+                border: 2px solid #93c5fd;
+                color: #ffffff;
             }
 
             /* Strong explicit nav button style (keeps text readable) */
             #pushButton_5, #pushButton_6, #pushButton_7, #pushButton_8, #pushButton_9 {
-                background: transparent;
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #3b82f6, stop:1 #2563eb);
                 color: #ffffff;
-                border-radius: 8px;
-                padding: 10px 12px;
-                font-size: 15px;
-                font-weight: 800;
+                border-radius: 10px;
+                padding: 12px 14px;
+                font-size: 14px;
+                font-weight: 700;
                 text-align: left;
+                border: 2px solid #60a5fa;
             }
             #pushButton_5:hover, #pushButton_6:hover, #pushButton_7:hover, #pushButton_8:hover, #pushButton_9:hover {
-                background: rgba(255,255,255,0.08);
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #60a5fa, stop:1 #3b82f6);
+                border: 2px solid #93c5fd;
             }
 
-            /* Calendar button: bold orange tile with dark text for accessibility */
+            /* Calendar button: vibrant teal tile */
             #pushButton_4 {
-                background: #ff7a00; /* orange */
-                color: #07121a; /* very dark for contrast */
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #14b8a6, stop:1 #0d9488);
+                color: #ffffff;
                 border-radius: 10px;
-                padding: 8px 10px;
-                font-weight: 900;
+                padding: 12px 14px;
+                font-weight: 700;
                 font-size: 14px;
+                border: 2px solid #2dd4bf;
             }
-            #pushButton_4:hover { background: #ff912b; }
+            #pushButton_4:hover { 
+                background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #2dd4bf, stop:1 #14b8a6);
+                border: 2px solid #5eead4;
+            }
 
             /* Main body */
             #mainBody { background: transparent; }
@@ -234,8 +311,9 @@ class Ui_MainWindow(object):
             QTableCornerButton::section { background: transparent; }
 
             /* Credits link in left menu */
-            #creditsLabel { color: #cfe8ff; font-weight: 700; }
-            #creditsLabel a { color: #cfe8ff; text-decoration: none; }
+            #creditsLabel { color: #93c5fd; font-weight: 700; font-size: 13px; }
+            #creditsLabel a { color: #93c5fd; text-decoration: none; }
+            #creditsLabel a:hover { color: #bfdbfe; text-decoration: underline; }
 
             /* Focus outlines for keyboard users */
             QPushButton:focus, QLineEdit:focus, QTableWidget:focus { outline: 3px solid rgba(11,23,38,0.12); }
