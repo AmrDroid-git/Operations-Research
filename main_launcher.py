@@ -133,13 +133,18 @@ class Launcher(QtWidgets.QMainWindow):
         self.nerimene_btn = QtWidgets.QPushButton("📊 Nerimene — Billboard Selection")
         self.nerimene_btn.setStyleSheet(active_button_style)
         self.nerimene_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        
+        self.geodesie_btn = QtWidgets.QPushButton("🌍 Geodesic Network")
+        self.geodesie_btn.setStyleSheet(active_button_style)
+        self.geodesie_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+                
         # Add buttons to grid
         grid.addWidget(self.my_work_btn, 0, 0)
         grid.addWidget(self.btn5, 0, 1)
         grid.addWidget(self.shift_scheduler_btn, 1, 0)
         grid.addWidget(self.puzzle_btn, 1, 1)
-        # Nerimene button below other buttons, spanning both columns
-        grid.addWidget(self.nerimene_btn, 2, 0, 1, 2)
+        grid.addWidget(self.nerimene_btn, 2, 0)
+        grid.addWidget(self.geodesie_btn, 2, 1)
 
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
@@ -157,7 +162,7 @@ class Launcher(QtWidgets.QMainWindow):
             }
         """)
 
-        footer_text = QtWidgets.QLabel("💡 Tip: Click on blue buttons to access active modules")
+        footer_text = QtWidgets.QLabel("Click on blue buttons to access active modules")
         footer_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         footer_text.setStyleSheet("""
             QLabel {
@@ -186,6 +191,8 @@ class Launcher(QtWidgets.QMainWindow):
         self.shift_scheduler_btn.clicked.connect(self.open_shift_scheduler)
         self.puzzle_btn.clicked.connect(self.open_puzzle)
         self.nerimene_btn.clicked.connect(self.open_nerimene)
+        self.geodesie_btn.clicked.connect(self.open_geodesie)  # ← NOUVEAU
+
 
     def open_amr_work(self):
         if not hasattr(self, 'amr_window'):
@@ -255,6 +262,22 @@ class Launcher(QtWidgets.QMainWindow):
             error_msg = QtWidgets.QMessageBox(self)
             error_msg.setWindowTitle("Error")
             error_msg.setText(f"Failed to open Nerimene module:\n{str(e)}")
+            error_msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+            error_msg.exec()
+            
+    def open_geodesie(self):
+        """Open the Geodesic Network Design application"""
+        try:
+            from geodesie_app.geodesie_app import GeodesieMainWindow
+            
+            if not hasattr(self, 'geodesie_window'):
+                self.geodesie_window = GeodesieMainWindow()
+            self.geodesie_window.showMaximized()
+            self.geodesie_window.raise_()
+        except Exception as e:
+            error_msg = QtWidgets.QMessageBox(self)
+            error_msg.setWindowTitle("Error")
+            error_msg.setText(f"Failed to open Geodesic Network:\n{str(e)}")
             error_msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
             error_msg.exec()
 

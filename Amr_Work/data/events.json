@@ -80,7 +80,7 @@
         {
           "event": "reunion math",
           "duration": "08:00 -> 10:00",
-          "class": "A1"
+          "class": "A3"
         },
         {
           "event": "carnaval",
@@ -90,7 +90,7 @@
         {
           "event": "nothing",
           "duration": "10:00 -> 11:00",
-          "class": "A1"
+          "class": "A3"
         },
         {
           "event": "physique",
@@ -100,11 +100,16 @@
         {
           "event": "etude",
           "duration": "12:00 -> 14:00",
-          "class": "A2"
+          "class": "A1"
         },
         {
           "event": "carnaval2",
           "duration": "11:00 -> 13:00",
+          "class": "A3"
+        },
+        {
+          "event": "sdfsdf",
+          "duration": "09:00 -> 12:00",
           "class": "A1"
         }
       ]
